@@ -1,0 +1,10 @@
+.DS_Store
+.AppleDouble
+__MACOSX/
+*.ai
+*.ait
+*.psd
+Illustrator_Export_*/
+__pycache__/
+*.pyc
+.tmp/

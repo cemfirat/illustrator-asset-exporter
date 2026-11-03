@@ -1,0 +1,25 @@
+name: Static checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  syntax-and-tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check JSX syntax (not Illustrator runtime)
+        run: |
+          for file in scripts/*.jsx; do
+            tail -n +2 "$file" | node --check
+          done
+      - name: Run mocked preflight tests
+        run: node tests/test_preflight.js
+      - name: Check WebP shell syntax
+        run: bash -n tools/convert_webp.sh
+      - name: Test Xcode packaging helper
+        run: python3 -m unittest discover -s tests -v
