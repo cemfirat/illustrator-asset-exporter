@@ -1,5 +1,7 @@
 .DS_Store
 ._*
+__MACOSX/
+Icon?
 Thumbs.db
 # Local output only; curated examples/exports stays tracked.
 /exports/

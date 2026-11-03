@@ -2,6 +2,7 @@ name: Validate native presets
 on:
   push:
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -12,7 +13,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - name: Check native preset structure (not Illustrator rendering)
+      - name: Check native presets and regression cases (not Illustrator rendering)
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -24,8 +25,7 @@ jobs:
           files = {p.name for p in Path('presets').iterdir() if p.is_file() and p.name != 'README.md'}
           assert files == set(profiles), 'Unexpected or missing preset files'
           pattern = re.compile(r'/collection(\d+)\s*\{\s*/attributes\s*\{\s*/scale\s+([0-9.]+)\s*/suffix\s*\[\s*(\d+)\s*([0-9a-fA-F]*)\s*\]\s*/fileformat\s+(\d+)\s*/scaleType\s+0\s*\}\s*/canEdit\s+1\s*/canDelete\s+1\s*\}')
-          for name, expected in profiles.items():
-              raw = (Path('presets') / name).read_bytes()
+          def validate(name, raw, expected):
               assert b'\r' in raw and b'\n' not in raw, name + ': preserve CR line endings'
               text = raw.decode('ascii')
               matches = list(pattern.finditer(text))
@@ -45,6 +45,84 @@ jobs:
               metadata = pattern.sub('', text)
               tail = r'\s*/Sketch\s*\{\s*/Version\s+0\s*/Description\s*\(' + re.escape(name) + r'\)\s*/Owner\s*\(\)\s*\}\s*/NumberOfCollections\s+' + str(len(expected)) + r'\s*/CatalogName\s*\(' + re.escape(name) + r'\)\s*'
               assert re.fullmatch(tail, metadata), name + ': unexpected metadata or extra content'
-              print('OK:', name, '-', len(rows), 'rows')
-          print('Validated', len(profiles), 'native preset structures; no Illustrator import/render was executed.')
+          for name, expected in profiles.items():
+              validate(name, (Path('presets') / name).read_bytes(), expected)
+              print('OK:', name, '-', len(expected), 'rows')
+          # Regression cases must be rejected, not merely documented.
+          name = 'Web Essentials'
+          raw = (Path('presets') / name).read_bytes()
+          cases = {
+              'changed line endings': raw.replace(b'\r', b'\n'),
+              'incorrect collection count': raw.replace(b'/NumberOfCollections 5', b'/NumberOfCollections 6'),
+              'incorrect scale': raw.replace(b'/scale 2.0', b'/scale 3.0', 1),
+              'incorrect suffix length': raw.replace(b'/suffix [ 3', b'/suffix [ 4', 1),
+              'incorrect format': raw.replace(b'/fileformat 12', b'/fileformat 99', 1),
+              'duplicate collection': raw.replace(b'/collection2 ', b'/collection1 ', 1),
+              'extra content': raw + b'\r/unexpected true',
+          }
+          for label, bad in cases.items():
+              assert bad != raw, 'Ineffective regression fixture: ' + label
+              try:
+                  validate(name, bad, profiles[name])
+              except (AssertionError, ValueError, UnicodeError):
+                  print('Rejected:', label)
+              else:
+                  raise AssertionError('Accepted malformed preset: ' + label)
+          print('Validated 6 native presets (18 rows) and rejected 7 malformed variants; no Illustrator rendering.')
+          PY
+      - name: Verify presets-only download and checksum
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib
+          import json
+          
+          archive = Path('downloads/illustrator-native-export-presets.zip')
+          expected_digest, filename = Path('downloads/SHA256SUMS').read_text().strip().split('  ')
+          assert filename == archive.name, 'Checksum filename mismatch'
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == expected_digest, 'Checksum mismatch'
+          profiles = json.loads(Path('.github/preset-manifest.json').read_text())['profiles']
+          expected = {'START_HERE.md': Path('downloads/START_HERE.md'), 'LICENSE': Path('LICENSE')}
+          expected.update({'presets/' + name: Path('presets') / name for name in profiles})
+          prefix = 'illustrator-native-export-presets/'
+          with ZipFile(archive) as package:
+              names = package.namelist()
+              assert len(names) == len(set(names)), 'Duplicate ZIP entries'
+              assert set(names) == {prefix + name for name in expected}, 'Unexpected ZIP contents'
+              assert package.testzip() is None, 'ZIP CRC error'
+              for name, source in expected.items():
+                  assert package.read(prefix + name) == source.read_bytes(), 'Stale package file: ' + name
+          print('Verified all 8 package files and SHA-256 checksum.')
+          PY
+      - name: Check internal links and repository hygiene
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.parse import unquote, urlsplit
+          import re
+          import subprocess
+          
+          root = Path.cwd().resolve()
+          tracked = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
+          tracked = [name for name in tracked if name]
+          assert not any(Path(name).suffix.lower() == '.jsx' for name in tracked), 'Export script reintroduced'
+          assert not any(name.split('/')[0] in {'scripts', 'tools', 'tests'} for name in tracked), 'Legacy tooling reintroduced'
+          junk = {'.DS_Store', 'Thumbs.db', 'Icon?', 'Icon\r'}
+          for name in tracked:
+              path = Path(name)
+              assert path.name not in junk and not path.name.startswith('._') and '__MACOSX' not in path.parts, 'Desktop metadata: ' + name
+          count = 0
+          for name in tracked:
+              if not name.endswith('.md'):
+                  continue
+              path = Path(name)
+              for link in re.findall(r'(?<!!)\[[^\]]+\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
+                  target = urlsplit(link)
+                  if target.scheme or target.netloc or not target.path:
+                      continue
+                  resolved = (path.parent / unquote(target.path)).resolve()
+                  assert resolved.is_relative_to(root) and resolved.exists(), name + ': broken local link: ' + link
+                  count += 1
+          print('Verified', count, 'internal Markdown file links and native-only repository hygiene.')
           PY
