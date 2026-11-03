@@ -5,3 +5,7 @@
 *.sh text eol=lf
 *.md text eol=lf
 *.yml text eol=lf
+# Preserve Adobe preset bytes and CR line endings. Documentation stays text.
+presets/* -text
+presets/*.md text eol=lf
+presets/*.json text eol=lf

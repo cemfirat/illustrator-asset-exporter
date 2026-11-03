@@ -19,7 +19,9 @@ jobs:
           done
       - name: Run mocked preflight tests
         run: node tests/test_preflight.js
+      - name: Run mocked native-helper tests (not PDF rendering)
+        run: node tests/test_native_helper.js
       - name: Check WebP shell syntax
         run: bash -n tools/convert_webp.sh
-      - name: Test Xcode packaging helper
+      - name: Test packaging tools and native preset structure
         run: python3 -m unittest discover -s tests -v

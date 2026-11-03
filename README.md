@@ -1,104 +1,85 @@
 # Illustrator Asset Exporter
 
-**Your artboard names. Organized assets. One PDF for marked pages.**
+**Native presets when you want the Illustrator dialog. Scripts when you want naming rules.**
 
-Batch-export Adobe Illustrator artboards for iOS, Android, and web with original filenames, multi-scale assets, and rule-based multi-page PDFs.
+Export Adobe Illustrator artboards for iOS, Android, and web. Keep artboard-based filenames and collect underscore-marked pages into one PDF.
 
-> **Preview: Illustrator runtime validation is still required.** Automated checks cover JavaScript syntax, mocked filename preflight, and helper tools. They do not run Adobe Illustrator or prove export fidelity. This is an independent ExtendScript project, not an Adobe product or an importable Export for Screens preset.
+> **Preview, not Illustrator-certified.** This repository now contains both native Export for Screens preset files and ExtendScript tools. The presets are derived from an actual Adobe-exported preset supplied by the maintainer. Their structure and the scripts' mocked behavior are checked, but importing them and rendering exports in Illustrator still need a real macOS test. This is an independent project, not an Adobe product.
 
-## What it does
+## Choose your workflow
 
-- **Keeps your names:** `Home` becomes `Home.png`, `Home@2x.png`, `Home@3x.png`, and `Home.svg` where those targets are enabled. No `ui_` prefix and no added artboard numbers.
-- **Routes marked artboards to one PDF:** `_Cover`, `_Guide`, and `*Appendix` become pages in the same PDF, in Illustrator artboard order. They are never included in PNG, JPEG, or SVG asset exports.
-- **Exports platform densities:** iOS PNG at 1x/2x/3x; Android PNG at mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi; web SVG and PNG at 1x/2x, plus optional JPEG.
-- **Checks filenames before exporting:** detects case-insensitive duplicates, generated scale collisions, invalid names, and Android normalization collisions.
-- **Protects the source:** the PDF operation uses a temporary copy of a saved `.ai` file, not `saveAs` on your open original.
-- **Includes optional tools:** WebP conversion and Xcode `.imageset` packaging. Neither requires changes to the Illustrator script.
+| Workflow | Use it for | What handles `_` / literal `*` pages? |
+| --- | --- | --- |
+| **Native presets + small helper** | Keep the native dialog, including direct WebP export | The helper creates one PDF and shows the regular-artboard range to copy into the native dialog |
+| **Full batch script** | Automated iOS, Android density folders, web PNG/SVG/JPEG and PDF routing | The full script handles the split automatically |
+| **Native presets only** | No script execution | Select regular assets and marked pages in two separate native export passes |
 
-## Quick start on macOS
+**A native format preset does not implement a filename condition.** Its format rows apply to the artboards you select. Neither a preset nor the new helper silently changes the native dialog's selection. Do not leave **Select All** enabled when you want marked pages excluded from asset exports.
+
+## Recommended: native presets + PDF helper
 
 1. Download this repository with **Code > Download ZIP**, then extract it.
-2. Open your artwork in Adobe Illustrator. Save the latest changes as `.ai` before exporting a combined PDF.
-3. Choose **File > Scripts > Other Script...** (German UI: **Datei > Skripten > Anderes Skript...**).
-4. Select [`scripts/Illustrator_Asset_Exporter.jsx`](scripts/Illustrator_Asset_Exporter.jsx).
-5. Choose the export targets and destination folder.
-6. Check `ExportReport.txt` and inspect your output before using it in production.
+2. In Illustrator, open **File > Export > Export for Screens**. In the presets menu, choose **Import Preset** and select a file from [`presets/`](presets/README.md), such as `Web Essentials`. The preset files intentionally have no extension, matching the supplied Adobe export.
+3. Close that dialog. Run **File > Scripts > Other Script...** and choose [`scripts/Illustrator_Native_Export_Helper.jsx`](scripts/Illustrator_Native_Export_Helper.jsx).
+4. The helper shows two ranges: regular assets and PDF-only pages. Copy the regular-asset range with **Cmd+C**. Its **Export marked PDF...** button creates one PDF from `_` / literal `*` artboards only. Save current changes as a local `.ai` file first.
+5. Close the helper. Reopen **Export for Screens > Artboards**, choose **Range**, paste the regular-asset range, apply the desired preset, leave **Prefix** empty, and export.
 
-The main script runs inside Illustrator. **No terminal, Python, Node.js, or external converter is needed for the main export.** Each run creates a new `Illustrator_Export_YYYYMMDD_HHMMSS` folder.
+If there are no regular assets, skip step 5; an empty range is not a safe substitute for excluding everything. If the artboard order changes, rerun the helper before using its ranges.
 
-## Naming rules
+**WebP is native in Illustrator versions that offer it in this dialog. No converter is needed for this workflow.** The optional converter below is only for outputs from the full batch script.
 
-| Artboard name | Result |
+| Native preset | Rows |
 | --- | --- |
-| `Home` | Original base name for iOS/web; scale suffixes where applicable |
-| `Login Screen` | Spaces and capitalization preserved for iOS/web |
-| `_Cover` | A page in the combined PDF only |
-| `_Instructions` | Another page in that same PDF only |
-| `*Appendix` | Also treated as PDF-only; `*` is a literal alternative marker, not a wildcard |
+| `Web Essentials` | SVG; PNG 1x/2x; WebP 1x/2x |
+| `Web Compatible` | SVG; PNG 1x/2x, without WebP |
+| `iOS PNG` | PNG 1x/2x/3x |
+| `Android PNG Scales` | PNG 1x/1.5x/2x/3x/4x; not a ready-made Android resource tree |
+| `SVG Only` | One SVG per selected artboard |
+| `PDF Only` | PDF row; choose **Single File** separately for a combined PDF |
 
-**Android is the exception:** resource filenames are normalized, for example `Login Screen` becomes `login_screen.png`. Changes appear in the report. The artboards themselves are not renamed.
+These files define scales, suffixes and formats only. They do **not** guarantee imported transparency, color profiles, WebP quality/lossless mode, artboard background color, selected ranges, output folders, Prefix, or the Single File PDF setting. Set those in Illustrator. See [native workflow and settings](docs/NATIVE_WORKFLOW.md).
 
-The PDF filename defaults to the document name and is editable in the export dialog. Disable the PDF option to **skip marked artboards**, not to export them as regular assets. Active-artboard mode limits all routing, including PDF, to the active artboard.
+## Alternative: full batch script
 
-Use unique names and avoid reserved `@1x`, `@2x`, and `@3x` suffixes. `Logo` and `Logo@2x` would collide when scale variants are generated. Invalid filenames are rejected rather than silently renamed. Filename validation is conservative; Unicode normalization edge cases still need real macOS testing.
+Run [`scripts/Illustrator_Asset_Exporter.jsx`](scripts/Illustrator_Asset_Exporter.jsx) with **File > Scripts > Other Script...**. Select targets and an output folder. No terminal, Node.js or Python is required for this main script.
 
-## Export matrix
+- iOS PNG at 1x/2x/3x; Android PNG in mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi folders.
+- Web SVG and PNG at 1x/2x; optional JPEG at quality 85.
+- `_Cover`, `_Guide` and `*Appendix` go into one PDF in artboard order, not into asset exports.
+- Case-insensitive filename and generated-suffix collisions are checked before export.
+- Every run creates a new `Illustrator_Export_YYYYMMDD_HHMMSS` folder and `ExportReport.txt`.
 
-| Target | Included in the JSX | Optional helper / roadmap |
-| --- | --- | --- |
-| iOS / iPadOS | PNG 1x, 2x, 3x | Xcode `.imageset` helper included; vector PDF image assets planned |
-| Android | PNG 1x, 1.5x, 2x, 3x, 4x in density folders | Vector Drawable XML conversion planned |
-| Web | SVG; PNG 1x/2x; optional JPEG 1x/2x at quality 85 | WebP helper included; AVIF planned |
-| `_` / `*` pages | One multi-page PDF | Document PDF, not a print-certified PDF/X preset |
+The original filename base is preserved for iOS/web: `Home.png`, `Home@2x.png`, `Home@3x.png`, `Home.svg`. No automatic `ui_` prefix or artboard numbering. **Android resource names are normalized** when needed, for example `Login Screen` to `login_screen.png`; changes appear in the report. The native Android scale preset does not perform this normalization or build Android resource directories.
 
-### Example output
+The PDF filename defaults to the document name and is editable. Disabling PDF skips marked pages rather than converting them to regular assets. Active-artboard mode limits all processing, including PDF. The PDF operation uses a saved `.ai` copy, not `saveAs` on the open original. In the full script, verify linked images in the exported PDF; the smaller native helper places its temporary copy next to the source to preserve relative link paths.
 
-```text
-Illustrator_Export_YYYYMMDD_HHMMSS/
-  iOS/PNG/Home.png, Home@2x.png, Home@3x.png
-  Android/drawable-mdpi/home.png
-  Android/drawable-hdpi/home.png
-  Android/drawable-xhdpi/home.png
-  Android/drawable-xxhdpi/home.png
-  Android/drawable-xxxhdpi/home.png
-  Web/PNG/Home.png, Home@2x.png
-  Web/SVG/Home.svg
-  Web/JPG/Home.jpg, Home@2x.jpg       (optional)
-  PDF/MyDocument.pdf                (marked pages only)
-  ExportReport.txt
-```
-
-### Optional WebP conversion
-
-The included converter reads `Web/PNG` and writes `Web/WebP`, preserving base names:
+### Optional helpers for the full script
 
 ```bash
+# WebP: only needed when using the full script instead of native WebP export.
 brew install webp
 bash tools/convert_webp.sh "/path/to/Illustrator_Export_YYYYMMDD_HHMMSS" --lossless
-# For photographic artwork instead:
+# For photographic artwork:
 bash tools/convert_webp.sh "/path/to/Illustrator_Export_YYYYMMDD_HHMMSS" --lossy 85
-```
 
-Requires `cwebp`; this is **not a checkbox in the JSX dialog**. Adobe documents WebP in its own export UI, but that does not establish compatibility for this script's automation path. Re-running the helper replaces same-named generated WebP files.
-
-### Optional Xcode image sets
-
-```bash
+# Xcode image sets from the full script's iOS PNG folder:
 python3 tools/build_xcassets.py "/path/to/Illustrator_Export_YYYYMMDD_HHMMSS"
 ```
 
-Creates `Xcode/Assets.xcassets/<artboard-name>.imageset` folders containing PNGs and `Contents.json`. Copy the `.imageset` folders into an Xcode asset catalog. Python 3 is required; no third-party Python packages are needed. Re-running replaces files for the same image sets. These are ordinary bitmap assets, **not app icons**.
+The WebP helper requires `cwebp`. The Xcode helper requires Python 3 and creates regular `.imageset` assets with `Contents.json`, not app icons. Re-running these helpers replaces same-named generated outputs.
 
-## Before production use
+## What preview means for you
 
-Design at the intended **1x logical size**; the exporter multiplies that size, it does not infer device dimensions. Review RGB/sRGB settings, transparency, raster-effect resolution, fonts, clipping, and linked images. For PDF export, embed linked images or verify all links resolve in the temporary copy.
+You may download and try the project now; a release tag is not required to use it. Test on a copy of your artwork and inspect output dimensions, transparency, colors, filenames, fonts, links and PDF page order before customer delivery. Passing CI means the automated checks passed, **not** that Adobe Illustrator rendered the files correctly.
 
-The script does not implement automatic color-profile conversion, native preset import, AVIF, Android XML conversion, app/launcher icons, store screenshots, or PDF/X preflight. SVG artboard selection and PDF page order must be checked in your installed Illustrator version. No Illustrator/macOS version is certified yet.
+No Illustrator/macOS version is certified yet. Native preset import also remains unverified. AVIF, Android Vector Drawable XML, specialized app icons, store screenshots, automatic profile conversion and print-certified PDF/X are not implemented. Their absence does not prevent the documented PNG/SVG/PDF workflows or native WebP export.
 
-See [format strategy](docs/EXPORT_FORMATS.md), [testing checklist](docs/TESTING.md), and [contributing](CONTRIBUTING.md).
+A version heading in the changelog is documentation, not a GitHub Release. A tag marks a particular commit; a release packages a version with notes. Neither is a guarantee of quality.
+
+See [format strategy](docs/EXPORT_FORMATS.md), [native workflow](docs/NATIVE_WORKFLOW.md), [full-script testing checklist](docs/TESTING.md) and [contributing](CONTRIBUTING.md).
 
 ## License
 
 [MIT](LICENSE). Copyright (c) 2026 Cem Firat.
 
-Adobe Illustrator, Xcode, Android, and related names are trademarks of their respective owners. This project is not affiliated with Adobe, Apple, or Google.
+Adobe Illustrator, Xcode, Android and related names are trademarks of their respective owners. This project is not affiliated with Adobe, Apple or Google.
