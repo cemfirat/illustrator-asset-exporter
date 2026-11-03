@@ -1,49 +1,57 @@
-# Native presets, with or without a PDF helper
+# Native workflow
 
-## Why both approaches exist
+Everything in this workflow happens in Illustrator's **Export for Screens** dialog. No script, terminal or converter is required.
 
-Illustrator's native Export for Screens dialog is the preferred route when you want visual control and its native WebP settings. The full batch script remains useful when you want automatic platform folders and rule-based routing. A preset stores format rows; it is not an `if artboard.name starts with '_'` rule.
+## 1. Import once
 
-## Hybrid workflow
+Download and extract the repository ZIP. Open **File > Export > Export for Screens**, select **Artboards**, and open the presets menu beside **Formats**. Choose **Import Preset** and select an extensionless file from `presets/`, starting with **Web Essentials**. Repeat for **PDF Only** or other presets you actually need.
 
-1. Import a preset from `presets/` using the presets menu in Export for Screens. Close the native export dialog before running scripts.
-2. Run `scripts/Illustrator_Native_Export_Helper.jsx` through File > Scripts > Other Script.
-3. Copy the displayed **regular-asset range**. For example, if artboards 1-3 are marked and 4-20 are assets, it is `4-20`. Mixed positions can produce `2,4-7,9`.
-4. Use **Export marked PDF...** to save one PDF containing all `_` and literal `*` pages in artboard order. The helper does not raster-export them. With no marked pages, this button is disabled.
-5. Close the helper. Open Export for Screens, select the Artboards tab and **Range**, and paste the regular-asset range. Do not select All or Full Document. Apply the asset preset and export.
+Use **Import Preset**, not File > Open, and do not select the README. Importing a preset is separate from choosing the artboards to export. Check the imported rows against the [preset table](../presets/README.md).
 
-The helper does not import a preset, edit native settings, fill the Range box, or press Export for you. It leaves normal asset export to the native interface. Rerun it after reordering or renaming artboards.
+If your version does not offer WebP, use **Web Compatible**. If an import fails, recreate the listed rows in Illustrator and use **Save As Preset**. Report the exact Illustrator version; changing a file extension is not a verified fix.
 
-For PDF output, save changes as a local `.ai` first. The source directory must be writable: the helper creates a uniquely named temporary copy **beside the source**, which helps keep relative image links valid. It saves the PDF from that copy, closes the copy without saving further changes, and removes it when possible. It never deliberately saves or closes the original. Existing PDF files are rejected rather than overwritten. Check any warning about temporary copies or partially written PDFs.
+## 2. Prepare names and dimensions
 
-## Fully native: no script
+Give every asset a unique artboard name. Keep the name you want in the exported file, such as `logo`, `logo-inverted` or `icon`. Leave **Prefix** empty: do not choose Artboard Number, Increasing Number or File Name as a prefix.
 
-Use two passes. First select only regular artboards and export with a web/iOS/Android preset. Then select only the marked artboards, apply `PDF Only`, and choose **PDF Files > Single File**. In the German UI this is **PDF-Dateien exportieren als > Einzelne Datei**, not **Mehrere Dateien**. The preset alone does not enforce that choice, identify underscores or guarantee the combined PDF's basename; check the resulting filename.
+At 1x, a 100 x 100 px artboard should produce a 100 x 100 px raster export; 2x produces 200 x 200 px. Work at an intentional base size and verify dimensions, especially with large-canvas documents or fractional artboard coordinates. A higher scale cannot restore missing detail in a placed bitmap.
 
-## Settings to review once in Illustrator
+Use `_fonts`, `_colors` and similar names as a visual marker for PDF pages. The underscore has no special meaning to Illustrator's native export selection. Do not add a literal asterisk as an automation marker; this workflow has no name parser.
 
-| Setting | Suggested starting point |
-| --- | --- |
-| Prefix | Empty; keep artboard-based names |
-| Base artboard size | Intended 1x size, not an arbitrary high-resolution screenshot |
-| Transparent logos/icons | PNG transparency on; disable Include Artboard Color when the artboard color should not be baked in |
-| Background artwork | An actual background rectangle still exports even with artboard-color inclusion off |
-| WebP | Lossless for crisp logos/UI; consider lossy for photos after visual comparison |
-| SVG | Check text/font handling, viewBox, clipping and embedded raster images |
-| Color | Prepare and verify the intended RGB/sRGB workflow; the preset does not convert profiles |
-| Subfolders | Organize by format or scale to suit the handoff; avoid duplicate filenames |
-| Combined PDF | Only marked pages selected; Single File enabled |
+Keep names unique even when ignoring case. Avoid slashes, control characters and names that already end in `@2x` or `@3x` when the preset generates those suffixes. There is no custom collision-checking script.
 
-These are project starting points, not a universal optimal-quality guarantee. Most brand assets do not need simultaneous 5x, 10x, 20x and 33x raster exports. SVG already provides scalable vector output where appropriate. Native Android scale exports are not Android Vector Drawables or pre-normalized Android resource folders; use the full script for the latter PNG folder layout.
+## 3. Export assets
 
-## First-run verification
+Select **Artboards** and select only the ordinary asset artboards, using thumbnails or **Range**. Exclude the underscore pages manually. Choose **Web Essentials** or the relevant platform preset.
 
-Use a small disposable document with `_Cover`, `Logo` and `_Notes`. Import `Web Essentials` and verify its five rows: SVG, PNG 1x/2x, WebP 1x/2x. With the helper, the asset range must be `2`, and the PDF must contain two pages in the order `_Cover`, `_Notes`. Export only asset range `2`; inspect names, alpha, pixel dimensions and colors. Confirm the original `.ai` remains open and unchanged by the PDF operation.
+Set the destination to a fresh `exports/` folder in your project. For a mixed web preset, enable **Create Subfolders > Format** to separate PNG, SVG and WebP. Folder labels can vary with Illustrator version; keep Illustrator's generated labels rather than renaming every exported file.
 
-Also test a non-contiguous PDF selection, existing PDF filename, unsaved document and linked image. Record exact Illustrator and macOS versions and the outcomes. Automated checks cannot establish these results.
+For transparent logos, review PNG transparency and disable **Include Artboard Color** when that color should not be included. A background rectangle in the artwork still exports. Review the [quality settings](SETTINGS.md), export, and inspect the results.
+
+When exporting for several platforms, use separate destinations such as `exports/web/`, `exports/ios/` and `exports/android/` to avoid overwriting similarly named PNGs. Use a new destination for a materially different export so stale files are not mistaken for current output.
+
+## 4. Export one PDF
+
+Clear the asset selection. Select only the underscore pages, apply **PDF Only**, and choose **PDF Files > Single File**. In German: **PDF-Dateien exportieren als > Einzelne Datei**, not **Mehrere Dateien**.
+
+Check the PDF format settings separately. The preset supplies one PDF format row; it does not activate Single File or install an Adobe PDF quality preset. Export, then inspect the actual filename, page count and page order in Preview or Acrobat. Rename the combined file in Finder if necessary, for example `brand-guide.pdf`.
+
+For a review/distribution PDF rather than an editable source handoff, review the chosen Adobe PDF settings and disable **Preserve Illustrator Editing Capabilities** when source data should not be embedded. Keep the editable `.ai` separately. This is not a redaction or sanitization guarantee.
+
+Example: pages 1-3 are `_fonts`, `_colors`, `_notes`, and pages 4-20 are assets. The asset pass uses `4-20`; the PDF pass uses `1-3`. A native preset cannot turn this into a conditional one-click export. Check the thumbnails after any reorder or rename.
+
+## 5. Check before delivery
+
+Confirm filenames and pixel dimensions, transparency against light and dark backgrounds, colors, fonts, clipping and placed images. Verify that only the intended pages appear in the PDF. Inspect the output, not merely the import dialog.
+
+Do not test by overwriting the checked-in examples. Use a duplicate source document and a new local output folder. The supplied [examples](../examples/README.md) are reference material, not a guaranteed expected-output test suite.
 
 ## References
 
-- [Adobe: Export for Screens](https://helpx.adobe.com/illustrator/desktop/save-and-export/export-files-to-different-formats/export-artboards-and-assets-for-screens.html)
-- [Adobe: native preset import/export and format settings](https://helpx.adobe.com/illustrator/using/collect-assets-export-for-screens.html)
-- [GitHub: releases and tags](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
+Reviewed on 2026-11-03:
+
+- [Adobe: Export for Screens selection, formats, prefixes and subfolders](https://helpx.adobe.com/illustrator/desktop/save-and-export/export-files-to-different-formats/export-artboards-and-assets-for-screens.html)
+- [Adobe: save, import and export custom presets](https://helpx.adobe.com/illustrator/desktop/save-and-export/export-files-to-different-formats/collect-and-export-assets-from-asset-export-panel.html)
+- [Adobe: PDF options and editable Illustrator data](https://helpx.adobe.com/uk/illustrator/using/pdf-options.html)
+
+The Single File label is also visible in the maintainer-supplied Illustrator dialog screenshot. UI labels and available options can differ by version.

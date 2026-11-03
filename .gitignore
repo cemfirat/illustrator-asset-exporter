@@ -1,10 +1,5 @@
 .DS_Store
-.AppleDouble
-__MACOSX/
-*.ai
-*.ait
-*.psd
-Illustrator_Export_*/
-__pycache__/
-*.pyc
-.tmp/
+._*
+Thumbs.db
+# Local output only; curated examples/exports stays tracked.
+/exports/

@@ -1,11 +1,13 @@
 * text=auto
-*.jsx text eol=lf
-*.js text eol=lf
-*.py text eol=lf
-*.sh text eol=lf
 *.md text eol=lf
 *.yml text eol=lf
-# Preserve Adobe preset bytes and CR line endings. Documentation stays text.
+*.json text eol=lf
+# Native presets must retain their original CR bytes.
 presets/* -text
-presets/*.md text eol=lf
-presets/*.json text eol=lf
+presets/README.md text eol=lf
+*.ai binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary

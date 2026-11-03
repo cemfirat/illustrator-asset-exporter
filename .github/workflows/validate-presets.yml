@@ -1,0 +1,50 @@
+name: Validate native presets
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  preset-structure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check native preset structure (not Illustrator rendering)
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+          
+          manifest = json.loads(Path('.github/preset-manifest.json').read_text())
+          profiles = manifest['profiles']
+          files = {p.name for p in Path('presets').iterdir() if p.is_file() and p.name != 'README.md'}
+          assert files == set(profiles), 'Unexpected or missing preset files'
+          pattern = re.compile(r'/collection(\d+)\s*\{\s*/attributes\s*\{\s*/scale\s+([0-9.]+)\s*/suffix\s*\[\s*(\d+)\s*([0-9a-fA-F]*)\s*\]\s*/fileformat\s+(\d+)\s*/scaleType\s+0\s*\}\s*/canEdit\s+1\s*/canDelete\s+1\s*\}')
+          for name, expected in profiles.items():
+              raw = (Path('presets') / name).read_bytes()
+              assert b'\r' in raw and b'\n' not in raw, name + ': preserve CR line endings'
+              text = raw.decode('ascii')
+              matches = list(pattern.finditer(text))
+              assert len(matches) == len(expected), name + ': unexpected row count'
+              rows = {}
+              for match in matches:
+                  index, scale, length, encoded, fmt = match.groups()
+                  suffix = bytes.fromhex(encoded)
+                  assert len(suffix) == int(length), name + ': invalid suffix byte length'
+                  index = int(index)
+                  assert index not in rows, name + ': duplicate collection'
+                  rows[index] = {'format_id': int(fmt), 'scale': float(scale), 'suffix': suffix.decode('ascii')}
+              assert sorted(rows) == list(range(1, len(expected) + 1)), name + ': invalid numbering'
+              assert [rows[i] for i in sorted(rows)] == expected, name + ': manifest mismatch'
+              keys = [(r['format_id'], r['suffix'].lower()) for r in rows.values()]
+              assert len(keys) == len(set(keys)), name + ': colliding output rows'
+              metadata = pattern.sub('', text)
+              tail = r'\s*/Sketch\s*\{\s*/Version\s+0\s*/Description\s*\(' + re.escape(name) + r'\)\s*/Owner\s*\(\)\s*\}\s*/NumberOfCollections\s+' + str(len(expected)) + r'\s*/CatalogName\s*\(' + re.escape(name) + r'\)\s*'
+              assert re.fullmatch(tail, metadata), name + ': unexpected metadata or extra content'
+              print('OK:', name, '-', len(rows), 'rows')
+          print('Validated', len(profiles), 'native preset structures; no Illustrator import/render was executed.')
+          PY

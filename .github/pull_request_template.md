@@ -1,11 +1,8 @@
-## Summary
+## Change
+Describe the native preset, documentation or example change.
 
-## Validation
-- [ ] Automated checks pass.
-- [ ] Documentation reflects implemented behavior.
-- [ ] Original filenames and PDF-only routing are preserved.
-- [ ] No private artwork, credentials, or local paths are included.
-
-Real Illustrator/macOS versions tested (or explicitly state "not tested"):
-
-Known limitations:
+## Verification
+- [ ] Preset rows and the manifest agree, if changed.
+- [ ] Import/export behavior is tested in a named Illustrator/OS version, or explicitly marked unverified.
+- [ ] Documentation does not promise automatic underscore filtering.
+- [ ] Example rights and privacy have been checked; no font files are included.

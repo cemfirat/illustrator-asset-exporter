@@ -1,23 +1,21 @@
 ---
-name: Bug report
-about: Report a reproducible export problem
-title: "[Bug] "
-labels: ""
-assignees: ""
+name: Preset or export problem
+about: Report a native import, export or documentation problem
+title: ''
+labels: ''
+assignees: ''
 ---
 
 ## Environment
 - Illustrator version:
-- macOS version:
-- Script version or commit:
-- Export targets:
+- macOS or other operating-system version:
+- Preset name:
 
-## Steps to reproduce
+## Steps and result
+- Imported rows:
+- Artboard selection and dimensions:
+- Relevant format settings:
+- Expected result:
+- Actual result:
 
-## Expected output
-
-## Actual output
-
-## Artboard names and redacted report
-
-Remove usernames, private paths, confidential artwork, and credentials before posting. State whether this happened in real Illustrator or only in a helper tool.
+Attach only a minimal, non-confidential example. Remove local paths and private client details. Do not upload font files. State whether the preset imported successfully and whether the exported files were visually inspected.

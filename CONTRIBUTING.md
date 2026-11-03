@@ -1,23 +1,11 @@
 # Contributing
 
-Thank you for improving Illustrator Asset Exporter.
+Keep this project native and small: importable Export for Screens presets, documentation and useful examples. Export scripts, converters and packaging tools are outside the current scope.
 
-## Report a problem
+For a preset change, record the Illustrator and operating-system versions, preserve the extensionless format and CR line endings, update `.github/preset-manifest.json`, and include an actual import/export test report. Passing repository checks alone does not prove Illustrator compatibility.
 
-Include the Illustrator and macOS versions, selected export targets, relevant artboard names, expected output, actual output, and a redacted `ExportReport.txt` excerpt. A minimal reproduction is more useful than a large production document.
+For documentation changes, verify the native UI labels and link to primary Adobe, Apple or Android documentation where applicable. Never describe underscore names as an automatic selection rule.
 
-Do not upload private artwork, employer-owned files, credentials, usernames in local paths, or licensed assets without permission. Review reports before posting them publicly.
+For examples, include only material you may publish. Record the source, settings and expected results. Do not add private client work, secrets, machine-specific paths, font files or unnecessary high-resolution duplicates. Do not replace existing example outputs without explaining why.
 
-## Submit changes
-
-- Keep the JSX compatible with Illustrator's legacy ExtendScript: use ES3-style syntax, not `let`, `const`, arrow functions, template strings, or Node/browser APIs.
-- Preserve original iOS/web base names and apply normalization only to Android resource filenames.
-- Preserve the `_` / literal `*` PDF-only convention and the saved-source protection.
-- Add tests and documentation for behavior changes. Clearly distinguish implemented features, optional helpers, and roadmap items.
-- Run all commands in [the testing guide](docs/TESTING.md). Include exact versions for any real Illustrator tests.
-
-Static checks do not replace real Illustrator testing. Keep runtime limitations visible until they have been verified.
-
-## License
-
-By submitting a contribution, you agree that it may be distributed under this repository's MIT license. Only contribute code and assets you have permission to share.
+Report bugs with the provided issue template. Keep changes focused and use English for project documentation.
