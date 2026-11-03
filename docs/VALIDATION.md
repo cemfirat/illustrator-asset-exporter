@@ -2,18 +2,21 @@
 
 ## Automated checks
 
-The six extensionless preset files are derived from a maintainer-supplied Illustrator export. Repository checks parse their collection structure, suffix byte lengths, scale values and observed format identifiers, and compare all 18 rows against `.github/preset-manifest.json`.
+The seven extensionless preset files are derived from a maintainer-supplied Illustrator export. Repository checks parse their collection structure, suffix byte lengths, scale values and observed format identifiers, and compare all 29 rows against `.github/preset-manifest.json`.
 
-The native files retain their existing bytes and CR line endings. Format identifiers come from the supplied sample; they are not a published cross-version compatibility contract.
+The original six files retain their existing bytes. All Formats uses the same CR line endings and structure; JPG 100's format identifier is taken from the supplied export. Identifiers are not a published cross-version compatibility contract.
 
-Additional checks verify that the [presets-only ZIP](../downloads/README.md) contains exactly the six presets, quick-start guide and license, byte-for-byte matching the repository; its SHA-256 checksum matches; internal Markdown file links resolve; no export scripts or known desktop-metadata placeholders are tracked.
+All Formats is checked to include the union of all focused-preset rows exactly once, plus two JPG 100 rows. The original seven malformed-preset regression cases remain, with additional All Formats regression cases for JPEG identifiers, missing densities and colliding suffixes.
 
-**These checks do not launch Illustrator, import a preset, render artwork or inspect visual fidelity.** A green workflow is not a certification of the export result. Existing example outputs do not establish that these exact six presets generated them.
+Additional checks verify that the [presets-only ZIP](../downloads/README.md) contains exactly the seven presets, quick-start guide and license, byte-for-byte matching the repository; its SHA-256 checksum matches; internal Markdown file links resolve; no export scripts or known desktop-metadata placeholders are tracked.
+
+**These checks do not launch Illustrator, import a preset, render artwork or inspect visual fidelity.** A green workflow is not a certification of the export result. Existing example outputs do not establish that these exact presets generated them.
 
 ## Illustrator compatibility record
 
 | Preset | Structure/package | Recorded Illustrator import and render test |
 | --- | --- | --- |
+| All Formats | Automated checks available | Not yet recorded |
 | Web Essentials | Automated checks available | Not yet recorded |
 | Web Compatible | Automated checks available | Not yet recorded |
 | iOS PNG | Automated checks available | Not yet recorded |
@@ -29,6 +32,7 @@ Create a disposable RGB document with `_Cover`, `Logo` and `_Notes`. Make `Logo`
 
 | Preset and selection | Expected files / result |
 | --- | --- |
+| All Formats; artboard 2; PDF Multiple Files | 11 files: one SVG; five PNGs at 100/150/200/300/400 px; two WebP and two JPG 100 files at 100/200 px; one PDF. Inspect all dimensions, names and JPEG background. |
 | Web Essentials; artboard 2 | `Logo.svg`; `Logo.png` (100 x 100), `Logo@2x.png` (200 x 200); `Logo.webp` (100 x 100), `Logo@2x.webp` (200 x 200) |
 | Web Compatible; artboard 2 | The same SVG and two PNGs; no WebP |
 | iOS PNG; artboard 2 | `Logo.png` (100 x 100), `Logo@2x.png` (200 x 200), `Logo@3x.png` (300 x 300) |
@@ -36,7 +40,9 @@ Create a disposable RGB document with `_Cover`, `Logo` and `_Notes`. Make `Logo`
 | SVG Only; artboard 2 | `Logo.svg`; inspect the artboard extent, text and clipping |
 | PDF Only; artboards 1 and 3; Single File | One PDF with two pages, ordered `_Cover`, `_Notes`; verify its actual filename |
 
-Check transparency against light and dark backgrounds and compare colors, fonts, effects and linked/embedded images. Android outputs are scale variants, not ready-to-install resources: names and density folders still need developer preparation. UI labels and output behavior may differ by version; report mismatches rather than silently treating them as a pass.
+For All Formats, confirm the imported JPEG rows display **JPG 100**, and the PNG list has exactly five scales with no duplicates. Expected JPEG names are `Logo.jpg` and `Logo@2x.jpg`, not `Logo-100.jpg`. The expected individual asset PDF is `Logo.pdf`; inspect the actual output. Selecting Multiple Files for asset PDFs and then Single File for the document pass is a manual step. Do not treat a combined asset PDF as 11 files per artboard.
+
+Check transparency against light and dark backgrounds for PNG/WebP, and compare colors, fonts, effects and linked/embedded images. JPEG is opaque and can show compression artifacts even at quality 100. Android outputs are scale variants, not ready-to-install resources: names and density folders still need developer preparation. UI labels and output behavior may differ by version; report mismatches rather than silently treating them as a pass.
 
 ## Report a result
 

@@ -4,7 +4,7 @@ Everything in this workflow happens in Illustrator's **Export for Screens** dial
 
 ## 1. Import once
 
-Download and extract the repository ZIP. Open **File > Export > Export for Screens**, select **Artboards**, and open the presets menu beside **Formats**. Choose **Import Preset** and select an extensionless file from `presets/`, starting with **Web Essentials**. Repeat for **PDF Only** or other presets you actually need.
+Download and extract the presets-only ZIP or the repository ZIP. Open **File > Export > Export for Screens**, select **Artboards**, and open the presets menu beside **Formats**. Choose **Import Preset** and select an extensionless file from `presets/`. Choose **All Formats** for the complete asset bundle or **Web Essentials** for lean web output. Repeat for **PDF Only** or other presets you actually need.
 
 Use **Import Preset**, not File > Open, and do not select the README. Importing a preset is separate from choosing the artboards to export. Check the imported rows against the [preset table](../presets/README.md).
 
@@ -22,17 +22,19 @@ Keep names unique even when ignoring case. Avoid slashes, control characters and
 
 ## 3. Export assets
 
-Select **Artboards** and select only the ordinary asset artboards, using thumbnails or **Range**. Exclude the underscore pages manually. Choose **Web Essentials** or the relevant platform preset.
+Select **Artboards** and select only the ordinary asset artboards, using thumbnails or **Range**. Exclude the underscore pages manually. Choose **All Formats**, **Web Essentials** or the relevant platform preset.
 
-Set the destination to a fresh `exports/` folder in your project. For a mixed web preset, enable **Create Subfolders > Format** to separate PNG, SVG and WebP. Folder labels can vary with Illustrator version; keep Illustrator's generated labels rather than renaming every exported file.
+**All Formats** applies all 11 rows to every selected artboard: SVG, five PNG scales, two WebP scales, two JPG 100 scales and PDF. For one PDF per asset, choose **PDF Files > Multiple Files** manually. It cannot apply the PDF row only to underscore pages. Select those pages separately with PDF Only in step 4.
 
-For transparent logos, review PNG transparency and disable **Include Artboard Color** when that color should not be included. A background rectangle in the artwork still exports. Review the [quality settings](SETTINGS.md), export, and inspect the results.
+Set the destination to a fresh `exports/` folder in your project. For mixed-format presets, enable **Create Subfolders > Format** to separate the output types. Folder labels can vary with Illustrator version; keep Illustrator's generated labels rather than renaming every exported file.
+
+For transparent logos, review PNG transparency and disable **Include Artboard Color** when that color should not be included. A background rectangle in the artwork still exports. JPEG is opaque; inspect its background separately. Review the [quality settings](SETTINGS.md), export, and inspect the results.
 
 When exporting for several platforms, use separate destinations such as `exports/web/`, `exports/ios/` and `exports/android/` to avoid overwriting similarly named PNGs. Use a new destination for a materially different export so stale files are not mistaken for current output.
 
 ## 4. Export one PDF
 
-Clear the asset selection. Select only the underscore pages, apply **PDF Only**, and choose **PDF Files > Single File**. In German: **PDF-Dateien exportieren als > Einzelne Datei**, not **Mehrere Dateien**.
+Clear the asset selection. Select only the underscore pages, apply **PDF Only**, and choose **PDF Files > Single File**. In German: **PDF-Dateien exportieren als > Einzelne Datei**, not **Mehrere Dateien**. Recheck this choice after an All Formats pass using Multiple Files.
 
 Check the PDF format settings separately. The preset supplies one PDF format row; it does not activate Single File or install an Adobe PDF quality preset. Export, then inspect the actual filename, page count and page order in Preview or Acrobat. Rename the combined file in Finder if necessary, for example `brand-guide.pdf`.
 

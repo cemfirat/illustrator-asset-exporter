@@ -19,7 +19,7 @@ jobs:
           from pathlib import Path
           import json
           import re
-          
+
           manifest = json.loads(Path('.github/preset-manifest.json').read_text())
           profiles = manifest['profiles']
           files = {p.name for p in Path('presets').iterdir() if p.is_file() and p.name != 'README.md'}
@@ -48,6 +48,17 @@ jobs:
           for name, expected in profiles.items():
               validate(name, (Path('presets') / name).read_bytes(), expected)
               print('OK:', name, '-', len(expected), 'rows')
+
+          # The combined preset must include every focused output exactly once,
+          # plus the two intentional JPEG delivery variants.
+          key = lambda row: (row['format_id'], row['scale'], row['suffix'])
+          focused = {key(row) for name, rows in profiles.items() if name != 'All Formats' for row in rows}
+          combined = [key(row) for row in profiles['All Formats']]
+          assert len(combined) == len(set(combined)), 'Duplicated All Formats output'
+          assert set(combined) == focused | {(2, 1, ''), (2, 2, '@2x')}, 'Incomplete All Formats union'
+          assert manifest['format_ids_observed']['2'] == 'JPG 100', 'Unexpected JPEG identifier'
+          print('OK: All Formats covers focused presets plus JPG 100 without duplicate outputs')
+
           # Regression cases must be rejected, not merely documented.
           name = 'Web Essentials'
           raw = (Path('presets') / name).read_bytes()
@@ -60,15 +71,24 @@ jobs:
               'duplicate collection': raw.replace(b'/collection2 ', b'/collection1 ', 1),
               'extra content': raw + b'\r/unexpected true',
           }
-          for label, bad in cases.items():
+          fixtures = [(name, raw, label, bad) for label, bad in cases.items()]
+          name = 'All Formats'
+          raw = (Path('presets') / name).read_bytes()
+          cases = {
+              'incorrect JPEG identifier': raw.replace(b'/fileformat 2\r', b'/fileformat 0\r', 1),
+              'missing 1.5x density': raw.replace(b'/scale 1.5\r', b'/scale 1.25\r', 1),
+              'colliding JPEG suffix': raw.replace(b'/suffix [ 3\r\t\t\t403278', b'/suffix [ 0\r\t\t\t', 1),
+          }
+          fixtures += [(name, raw, label, bad) for label, bad in cases.items()]
+          for name, raw, label, bad in fixtures:
               assert bad != raw, 'Ineffective regression fixture: ' + label
               try:
                   validate(name, bad, profiles[name])
               except (AssertionError, ValueError, UnicodeError):
-                  print('Rejected:', label)
+                  print('Rejected:', name, '-', label)
               else:
                   raise AssertionError('Accepted malformed preset: ' + label)
-          print('Validated 6 native presets (18 rows) and rejected 7 malformed variants; no Illustrator rendering.')
+          print('Validated', len(profiles), 'presets /', sum(map(len, profiles.values())), 'rows; rejected', len(fixtures), 'malformed variants; no Illustrator rendering.')
           PY
       - name: Verify presets-only download and checksum
         run: |
@@ -77,7 +97,7 @@ jobs:
           from zipfile import ZipFile
           import hashlib
           import json
-          
+
           archive = Path('downloads/illustrator-native-export-presets.zip')
           expected_digest, filename = Path('downloads/SHA256SUMS').read_text().strip().split('  ')
           assert filename == archive.name, 'Checksum filename mismatch'
@@ -93,7 +113,7 @@ jobs:
               assert package.testzip() is None, 'ZIP CRC error'
               for name, source in expected.items():
                   assert package.read(prefix + name) == source.read_bytes(), 'Stale package file: ' + name
-          print('Verified all 8 package files and SHA-256 checksum.')
+          print('Verified all', len(expected), 'package files and SHA-256 checksum.')
           PY
       - name: Check internal links and repository hygiene
         run: |
@@ -102,7 +122,7 @@ jobs:
           from urllib.parse import unquote, urlsplit
           import re
           import subprocess
-          
+
           root = Path.cwd().resolve()
           tracked = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
           tracked = [name for name in tracked if name]

@@ -2,7 +2,7 @@
 
 [Download illustrator-native-export-presets.zip](illustrator-native-export-presets.zip?raw=1)
 
-This small package contains only the six native preset files, [START_HERE.md](START_HERE.md) and the MIT license. It excludes example artwork, export scripts, converters and developer tooling. Extract it before importing a preset in Illustrator.
+This small package contains the seven native preset files, including **All Formats**, plus [START_HERE.md](START_HERE.md) and the MIT license. It excludes example artwork, export scripts, converters and developer tooling. Extract it before importing a preset in Illustrator.
 
 The ZIP contains the same preset bytes as [presets/](../presets/README.md). Its SHA-256 digest is recorded in [SHA256SUMS](SHA256SUMS); repository checks compare every packaged file with its source. This verifies integrity and consistency, not Illustrator compatibility or a digital signature.
 

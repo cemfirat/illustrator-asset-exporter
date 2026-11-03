@@ -2,112 +2,54 @@
   "source": "Derived from an Adobe-exported preset supplied by the repository owner; not yet import-tested.",
   "format_ids_observed": {
     "0": "PNG",
+    "2": "JPG 100",
     "6": "SVG",
     "7": "PDF",
     "12": "WebP"
   },
   "profiles": {
+    "All Formats": [
+      {"format_id": 6, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 1.5, "suffix": "@1.5x"},
+      {"format_id": 0, "scale": 2, "suffix": "@2x"},
+      {"format_id": 0, "scale": 3, "suffix": "@3x"},
+      {"format_id": 0, "scale": 4, "suffix": "@4x"},
+      {"format_id": 12, "scale": 1, "suffix": ""},
+      {"format_id": 12, "scale": 2, "suffix": "@2x"},
+      {"format_id": 2, "scale": 1, "suffix": ""},
+      {"format_id": 2, "scale": 2, "suffix": "@2x"},
+      {"format_id": 7, "scale": 2, "suffix": ""}
+    ],
     "Web Essentials": [
-      {
-        "format_id": 6,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 0,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 0,
-        "scale": 2,
-        "suffix": "@2x"
-      },
-      {
-        "format_id": 12,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 12,
-        "scale": 2,
-        "suffix": "@2x"
-      }
+      {"format_id": 6, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 2, "suffix": "@2x"},
+      {"format_id": 12, "scale": 1, "suffix": ""},
+      {"format_id": 12, "scale": 2, "suffix": "@2x"}
     ],
     "Web Compatible": [
-      {
-        "format_id": 6,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 0,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 0,
-        "scale": 2,
-        "suffix": "@2x"
-      }
+      {"format_id": 6, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 2, "suffix": "@2x"}
     ],
     "iOS PNG": [
-      {
-        "format_id": 0,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 0,
-        "scale": 2,
-        "suffix": "@2x"
-      },
-      {
-        "format_id": 0,
-        "scale": 3,
-        "suffix": "@3x"
-      }
+      {"format_id": 0, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 2, "suffix": "@2x"},
+      {"format_id": 0, "scale": 3, "suffix": "@3x"}
     ],
     "Android PNG Scales": [
-      {
-        "format_id": 0,
-        "scale": 1,
-        "suffix": ""
-      },
-      {
-        "format_id": 0,
-        "scale": 1.5,
-        "suffix": "@1.5x"
-      },
-      {
-        "format_id": 0,
-        "scale": 2,
-        "suffix": "@2x"
-      },
-      {
-        "format_id": 0,
-        "scale": 3,
-        "suffix": "@3x"
-      },
-      {
-        "format_id": 0,
-        "scale": 4,
-        "suffix": "@4x"
-      }
+      {"format_id": 0, "scale": 1, "suffix": ""},
+      {"format_id": 0, "scale": 1.5, "suffix": "@1.5x"},
+      {"format_id": 0, "scale": 2, "suffix": "@2x"},
+      {"format_id": 0, "scale": 3, "suffix": "@3x"},
+      {"format_id": 0, "scale": 4, "suffix": "@4x"}
     ],
     "SVG Only": [
-      {
-        "format_id": 6,
-        "scale": 1,
-        "suffix": ""
-      }
+      {"format_id": 6, "scale": 1, "suffix": ""}
     ],
     "PDF Only": [
-      {
-        "format_id": 7,
-        "scale": 2,
-        "suffix": ""
-      }
+      {"format_id": 7, "scale": 2, "suffix": ""}
     ]
   }
 }

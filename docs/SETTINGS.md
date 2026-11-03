@@ -1,12 +1,12 @@
 # Format and quality settings
 
-These are practical starting points, not one universal quality setting. The importable presets specify format rows, scales and suffixes; the following options must be checked in Illustrator separately.
+These are practical starting points, not one universal quality setting. The importable presets specify format rows, scales and suffixes; the following options must be checked in Illustrator separately. All Formats selects the native JPG 100 variant, but does not configure all detailed format options.
 
 ## Logos and web graphics
 
 | Setting | Starting point |
 | --- | --- |
-| Preset | Web Essentials; use Web Compatible when WebP is not needed |
+| Preset | All Formats for a complete bundle; Web Essentials for lean web output; Web Compatible without WebP |
 | Prefix | Empty |
 | Subfolders | Enabled, organized by format |
 | PNG | Full-color PNG, transparent background where required; avoid PNG-8 as a blanket default |
@@ -23,15 +23,15 @@ Transparent artwork can still look opaque if it contains a filled rectangle. Dis
 
 SVG is the vector option for appropriate web logos and icons. PNG and WebP are raster alternatives. Do not generate 5x, 10x, 20x and 33x variants by default; choose sizes required by the actual handoff. Ordinary scale multipliers do not generate a complete favicon package or store-icon set.
 
-JPEG is useful for photographic or deliberately opaque output, but does not preserve transparency. Add a JPEG row manually only when needed; do not add JPEG to every logo export. TIFF, EPS, AI and specialized print formats are outside this small screen-preset collection.
+All Formats includes JPEG at 1x/2x using the native **JPG 100** variant observed in the supplied preset. This is high-quality lossy output, not lossless compression, and it does not preserve transparency. Check the intended background, color model and profile. Use Web Essentials when JPEG and individual asset PDFs are unnecessary. TIFF, EPS, AI and specialized print formats are outside this small screen-preset collection; "All Formats" means its five screen/PDF format families, not every Illustrator format.
 
 ## iOS bitmap delivery
 
-**iOS PNG** produces 1x, 2x and 3x files. Treat 1x as the design base; retain only the variants the receiving project needs. Xcode recognizes `@2x` and `@3x` filename suffixes when importing images. These are ordinary bitmap assets, not an automatically generated asset catalog or app-icon set.
+**iOS PNG** produces 1x, 2x and 3x files. Treat 1x as the design base; retain only the variants the receiving project needs. Xcode recognizes `@2x` and `@3x` filename suffixes when importing images. These are ordinary bitmap assets, not an automatically generated asset catalog or app-icon set. All Formats contains the same PNG rows without duplicating them.
 
 ## Android bitmap delivery
 
-**Android PNG Scales** produces the following scales relative to mdpi:
+**Android PNG Scales** and **All Formats** include the following scales relative to mdpi:
 
 | Scale | Density | Typical destination after developer preparation |
 | --- | --- | --- |
@@ -41,11 +41,13 @@ JPEG is useful for photographic or deliberately opaque output, but does not pres
 | 3x | xxhdpi | drawable-xxhdpi |
 | 4x | xxxhdpi | drawable-xxxhdpi |
 
-The preset only exports size variants with suffixes. It does not create these Android resource directories, remove suffixes or normalize resource names. A developer must prepare valid resource names and place the variants into the correct folders. It is not an adaptive launcher icon or Vector Drawable XML workflow. Legacy ldpi and other special densities are not included in this preset.
+The presets only export size variants with suffixes. They do not create these Android resource directories, remove suffixes or normalize resource names. A developer must prepare valid resource names and place the variants into the correct folders. This is not an adaptive launcher icon or Vector Drawable XML workflow. Legacy ldpi and other special densities are not included.
 
 ## PDF delivery
 
-**PDF Only** is an Export for Screens format preset, not an Adobe PDF `.joboptions` quality preset. Select **Single File** and the intended artboards separately. Choose the actual PDF quality/color settings for the destination. Check whether editable Illustrator data should be embedded. This project does not certify PDF/X compliance or replace a printer's specifications.
+**PDF Only** and the PDF row in **All Formats** are Export for Screens settings, not Adobe PDF `.joboptions` quality presets. Use **Multiple Files** with All Formats for one PDF per selected asset. For one document PDF, select only the underscore pages, apply **PDF Only** and choose **Single File**. The presets do not set this option or filter names.
+
+Choose the actual PDF quality/color settings for the destination. Check whether editable Illustrator data should be embedded. This project does not certify PDF/X compliance or replace a printer's specifications.
 
 ## References
 

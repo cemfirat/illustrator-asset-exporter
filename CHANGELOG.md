@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-03 - All Formats native preset
+
+- Add All Formats: SVG, PNG 1x/1.5x/2x/3x/4x, WebP 1x/2x, JPG 100 1x/2x, and PDF.
+- Combine the focused presets without duplicate PNG outputs; use artboard-based names and scale suffixes only.
+- Keep the six existing presets and all example artwork unchanged.
+- Document manual PDF Multiple Files for individual asset PDFs and PDF Only / Single File for underscore pages.
+- Update the download, checksum, quick start, test matrix and automated checks for seven presets / 29 rows.
+- Add All Formats union/uniqueness checks and three malformed-file regression cases.
+
+This remains native-only. Actual Illustrator import/render testing is not claimed.
+
 ## 2026-11-03 - Distribution and validation audit
 
 - Add a small presets-only ZIP with a standalone English quick-start guide and SHA-256 checksum.

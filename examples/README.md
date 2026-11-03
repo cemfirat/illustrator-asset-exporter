@@ -24,7 +24,7 @@ The directory was moved from `Example/` to `examples/`. The Illustrator source a
 
 ## What the outputs demonstrate
 
-These are existing reference outputs, not a golden test suite for the six presets. They include additional sizes, JPEGs and favicon/platform-icon material outside the current preset set. Their presence does not mean Web Essentials creates all of them, or that every current preset has passed an Illustrator import test.
+These are existing reference outputs, not a golden test suite for the current presets. They include additional sizes and favicon/platform-icon material outside the preset set. All Formats includes JPEG 1x/2x, but it does not recreate every historical size or icon package here. Their presence does not mean any current preset generated them or has passed an Illustrator import test.
 
 To try the workflow, open a copy of the source and export to a new folder outside this directory. Do not overwrite the supplied references. For new examples, record the exact Illustrator/macOS version, preset, selected artboards and important format settings. See the [test matrix](../docs/VALIDATION.md).
 
